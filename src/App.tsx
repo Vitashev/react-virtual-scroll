@@ -18,13 +18,17 @@ const callApi = (offset: number, limit: number) => {
 
 function App() {
   const limit = 100
-  const [rows, setRows] = useState([])
+  // the number of items that we want to keep in memory - 300
+  const buffer = limit * 3
+  // the number of items that we want to cache when new chunk of data is loaded
+  const cache = buffer - limit
+  const [items, setItems] = useState([])
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     setIsLoading(true)
-    callApi(0, 300).then((res: any) => {
-      setRows(res)
+    callApi(0, buffer).then((res: any) => {
+      setItems(res)
       setIsLoading(false)
     })
   }, [])
@@ -33,8 +37,8 @@ function App() {
     setIsLoading(true)
 
     return callApi(newOffset, limit).then((res: any) => {
-      const newRows = [...res, ...rows.slice(0, 200)] as any
-      setRows(newRows)
+      const newItems = [...res, ...items.slice(0, cache)] as any
+      setItems(newItems)
       setIsLoading(false)
       return true
     })
@@ -44,8 +48,8 @@ function App() {
     setIsLoading(true)
 
     return callApi(newOffset, limit).then((res: any) => {
-      const newRows = [...rows.slice(99, 299), ...res] as any
-      setRows(newRows)
+      const newItems = [...items.slice(-cache), ...res] as any
+      setItems(newItems)
       setIsLoading(false)
       return true
     })
@@ -54,15 +58,15 @@ function App() {
   return (
     <div className="App">
       <UiVirtualScroll
-        buffer={300}
+        buffer={buffer}
         rowHeight={39}
         height="50vh"
-        limit={100}
+        limit={limit}
         onPrevCallback={prevCallback}
         onNextCallback={nextCallback}
       >
         <>
-          {rows.map((item: any, index: number) => (
+          {items.map((item: any, index: number) => (
             <div style={{ padding: '10px' }}>
               {isLoading ? <>Loading...</> : item}
             </div>
