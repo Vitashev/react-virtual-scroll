@@ -17,17 +17,13 @@ const callApi = (offset: number, limit: number) => {
 }
 
 function App() {
-  const myRef: any = useRef<any>(null)
   const limit = 100
-  const [upperOffset, setUpperOffset] = useState(0)
-  const [lowerOffset, setLowerOffset] = useState(299)
   const [rows, setRows] = useState([])
   const [isLoading, setIsLoading] = useState(false)
-  const [currentScrollTop, setCurrentScrollTop] = useState(0)
 
   useEffect(() => {
     setIsLoading(true)
-    callApi(upperOffset, 300).then((res: any) => {
+    callApi(0, 300).then((res: any) => {
       setRows(res)
       setIsLoading(false)
     })
